@@ -1,5 +1,5 @@
 
-export default function Images({ imageUrl, err, loading, fecthImages }) {
+export default function Images({ decreamentImgs, imageUrl, err, loading, fecthImages }) {
     
     async function handlDownload(url, id) {
         try {
@@ -19,20 +19,27 @@ export default function Images({ imageUrl, err, loading, fecthImages }) {
             window.URL.revokeObjectURL(blobUrl)
         } catch (error) {
             console.log("Download Feild", error)
+            alert("Failed to fetch!. Has No Internet or Network Error")
         }
     }
 
+    // console.log(imageUrl.length)
     return (
         <>
-        {/* <button onClick={fecthImages}>
-            Generate
-        </button> */}
+        <button className="reomev"
+        onClick={decreamentImgs}
+        >I</button>
+
          {loading && <p>Loading...</p>}
          {err && <p>{err}</p>}
 
         <div className="images">
-             {imageUrl.map(item => {
-                // console.log(item)
+             {imageUrl.length === 0 ? 
+               <div className="empty_img">
+                 <img src="" alt="" />
+                 <h3>Image Folder Is <strong>Empty</strong></h3>
+               </div>
+              : imageUrl.map(item => {
                return <div className="image" key={item.download_url}>
                   <img key={item.download_url} src={item.download_url} alt={item.author} loading="lazy"/>
 
@@ -40,13 +47,15 @@ export default function Images({ imageUrl, err, loading, fecthImages }) {
                 //   className="generate"
                   onClick={() => handlDownload(item.download_url, item.id)}
                   >Download</button>
+                  <span className="author"><strong>{item.author}</strong></span>
                 </div>
              })}  
              <div className="buttons">
              <button
-              onClick={fecthImages}
+              onClick={imageUrl.length === 100 ? '' : fecthImages}
               className="generat-more"
-             >{imageUrl.length > 0 ? "Show More" : "Generate Img"}</button>         
+             >{imageUrl.length > 0 ? 
+                "Show More" : imageUrl.length >= 10 ? "No More Images" : "Generate Img"}</button>         
             </div>   
          </div>
         

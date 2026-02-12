@@ -6,14 +6,28 @@
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
     const [pages, setPages] = useState(() => {
-      const saved = localStorage.getItem("page")
-      return saved ? JSON.parse(saved) : 0
+      const saveds = localStorage.getItem("page")
+      if(!saveds) return 1
+
+      try {
+        return JSON.parse(saveds)
+      } catch {
+        localStorage.removeItem("page")
+        return 1
+      }
     })
 
     useEffect(() => {
       const storedrData = localStorage.getItem("images")
       
-      storedrData ? setImageUrl(JSON.parse(storedrData)) : []
+      if (storedrData) {
+        try {
+          setImageUrl(JSON.parse(storedrData))
+        } catch (error) {
+          console.log(error)
+          localStorage.removeItem("images")
+        }
+      }
       
     }, [])
 
@@ -37,16 +51,21 @@
       setError(null)
 
       try {
-        const respons = await fetch(`https://picsum.photos/v2/list?page=${pages}&limit=6`)
+        const respons = 
+        await fetch(`https://picsum.photos/v2/list?page=${pages}&limit=10`)
         const data = await respons.json()
         setImageUrl(prev => [...prev, ...data])
-      } catch (error) {
-        setError("Failed to fetch images.")
-      }finally {
-        setLoading(false)
+        } catch (error) {
+          console.log(error)
+          setError("Failed to fetch images.")
+        }finally {
+          setLoading(false)
+        }    
       }
-    }
-
+    
+    function handleLocalStorage() {
+      setImageUrl(prev => prev.slice(10))
+    }  
     return (
       <>
        <Images 
@@ -54,6 +73,7 @@
          loading={loading}
          imageUrl={imageUrl}
          err={error}
+         decreamentImgs={handleLocalStorage}
        />
       </>
     )
